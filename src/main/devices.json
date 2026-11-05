@@ -1,0 +1,5 @@
+[
+  { "name": "Sonicware Lofi-12 XT", "sampleRate": 24000, "bitDepth": 16, "channels": 1 },
+  { "name": "Sonicware Lofi-12 (Original)", "sampleRate": 12000, "bitDepth": 16, "channels": 1 },
+  { "name": "Elektron Digitakt (Mk1)", "sampleRate": 44100, "bitDepth": 16, "channels": 1 }
+]

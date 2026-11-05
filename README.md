@@ -18,6 +18,8 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
   | Elektron Digitakt (Mk1) | 44.1 kHz | 16-bit | Mono |
 
   You can also pick sample rate (12/24/44.1/48 kHz), bit depth (16/24-bit) and channels (mono/stereo) by hand.
+
+  Missing your sampler? [Add it](#-adding-your-device) — it's one line.
 - **Smart filenames:** Replaces spaces and invalid characters with underscores and never overwrites existing files (a numbered suffix is added instead).
 - **Normalize:** Peak normalization to 0 dB for consistent volume across all your samples.
 - **Auto-Trim:** Removes silence at the start and end of each sample.
@@ -88,6 +90,22 @@ npm run dist:portable
 The app uses Electron, so it can in principle run on macOS and Linux with `sox` installed from your package manager, but only Windows has been tested.
 
 The original PureBasic version (v1.x) is still available in the git history and in the v1.0.0 release.
+
+## 🎛 Adding Your Device
+
+Device presets live in [`src/main/devices.json`](src/main/devices.json). To add a sampler, add one line and open a pull request:
+
+```json
+{ "name": "Maker Model", "sampleRate": 44100, "bitDepth": 16, "channels": 1 }
+```
+
+- `sampleRate`: 12000, 24000, 44100 or 48000
+- `bitDepth`: 16 or 24
+- `channels`: 1 (mono) or 2 (stereo)
+
+Please link the device's manual or spec page in the pull request so the values can be checked. `npm test` checks that every entry uses supported values. If your device needs a sample rate that isn't listed, add it to `SAMPLE_RATES` in `src/renderer/renderer.js` and to the test as well. Please also add a row to the table under Features.
+
+If you can't make a pull request, [open an issue](https://github.com/tristan202/sonicwaretool/issues) with the device name and its sample format.
 
 ## 📜 License
 

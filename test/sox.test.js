@@ -145,3 +145,18 @@ test('converts a WAV for the Lofi-12 XT with SoX', { skip: !soxPath && 'SoX not 
   // Auto-Trim removes the silence around the 0.5 s burst
   assert.ok(format.frames > 24000 * 0.4 && format.frames < 24000 * 0.6, `frames=${format.frames}`);
 });
+
+test('devices.json entries use values the app offers', () => {
+  const devices = require('../src/main/devices.json');
+  assert.ok(devices.length > 0);
+  const names = new Set();
+  for (const d of devices) {
+    assert.ok(typeof d.name === 'string' && d.name.trim(), `missing name: ${JSON.stringify(d)}`);
+    assert.ok(!names.has(d.name), `duplicate name: ${d.name}`);
+    names.add(d.name);
+    // Must match SAMPLE_RATES / BIT_DEPTHS / CHANNELS in src/renderer/renderer.js
+    assert.ok([12000, 24000, 44100, 48000].includes(d.sampleRate), `${d.name}: sampleRate ${d.sampleRate}`);
+    assert.ok([16, 24].includes(d.bitDepth), `${d.name}: bitDepth ${d.bitDepth}`);
+    assert.ok([1, 2].includes(d.channels), `${d.name}: channels ${d.channels}`);
+  }
+});

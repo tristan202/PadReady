@@ -2,11 +2,7 @@
 
 const $ = (id) => document.getElementById(id);
 
-const DEVICES = [
-  { name: 'Sonicware Lofi-12 XT', sampleRateIdx: 1, bitDepthIdx: 0, channelsIdx: 0 },
-  { name: 'Sonicware Lofi-12 (Original)', sampleRateIdx: 0, bitDepthIdx: 0, channelsIdx: 0 },
-  { name: 'Elektron Digitakt (Mk1)', sampleRateIdx: 2, bitDepthIdx: 0, channelsIdx: 0 },
-];
+let DEVICES = []; // loaded from src/main/devices.json
 const SAMPLE_RATES = ['12000', '24000', '44100', '48000'];
 const BIT_DEPTHS = [{ label: '16-bit', value: 16 }, { label: '24-bit', value: 24 }];
 const CHANNELS = [{ label: 'Mono', value: 1 }, { label: 'Stereo', value: 2 }];
@@ -385,15 +381,15 @@ function bindEvents() {
 
   $('comboDevice').addEventListener('change', () => {
     const device = DEVICES[$('comboDevice').selectedIndex];
-    $('comboSampleRate').selectedIndex = device.sampleRateIdx;
-    $('comboBitDepth').selectedIndex = device.bitDepthIdx;
-    $('comboChannels').selectedIndex = device.channelsIdx;
-    save({
-      deviceIdx: $('comboDevice').selectedIndex,
-      sampleRateIdx: device.sampleRateIdx,
-      bitDepthIdx: device.bitDepthIdx,
-      channelsIdx: device.channelsIdx,
-    });
+    const idx = {
+      sampleRateIdx: SAMPLE_RATES.indexOf(String(device.sampleRate)),
+      bitDepthIdx: BIT_DEPTHS.findIndex((b) => b.value === device.bitDepth),
+      channelsIdx: CHANNELS.findIndex((c) => c.value === device.channels),
+    };
+    $('comboSampleRate').selectedIndex = idx.sampleRateIdx;
+    $('comboBitDepth').selectedIndex = idx.bitDepthIdx;
+    $('comboChannels').selectedIndex = idx.channelsIdx;
+    save({ deviceIdx: $('comboDevice').selectedIndex, ...idx });
     showIdle();
   });
   const selects = { comboSampleRate: 'sampleRateIdx', comboBitDepth: 'bitDepthIdx', comboChannels: 'channelsIdx' };
@@ -439,7 +435,8 @@ function clampIndex(i, length) {
 }
 
 async function init() {
-  const { settings, strings, sox, languages } = await window.api.getInitialState();
+  const { settings, strings, sox, languages, devices } = await window.api.getInitialState();
+  DEVICES = devices;
   state.sox = sox;
   state.outputDir = settings.outputDir;
 

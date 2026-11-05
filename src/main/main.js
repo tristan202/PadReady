@@ -100,6 +100,7 @@ function registerIpc() {
     settings: settings.values,
     strings: strings(),
     languages: LANGUAGES,
+    devices: require('./devices.json'),
     sox: soxStatus(),
     version: app.getVersion(),
   }));
