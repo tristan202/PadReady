@@ -15,7 +15,11 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
   | --- | --- | --- | --- |
   | Sonicware Lofi-12 XT | 24 kHz | 16-bit | Mono |
   | Sonicware Lofi-12 (Original) | 12 kHz | 16-bit | Mono |
-  | Elektron Digitakt (Mk1) | 44.1 kHz | 16-bit | Mono |
+  | Elektron Digitakt (Mk1) | 48 kHz | 16-bit | Mono |
+  | Elektron Digitakt II | 48 kHz | 16-bit | Stereo |
+  | Roland SP-404MKII | 48 kHz | 16-bit | Stereo |
+  | Roland SP-404SX / SP-404A | 44.1 kHz | 16-bit | Stereo |
+  | Polyend Tracker | 44.1 kHz | 16-bit | Mono |
 
   You can also pick sample rate (12/24/44.1/48 kHz), bit depth (16/24-bit) and channels (mono/stereo) by hand.
 

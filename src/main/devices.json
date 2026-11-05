@@ -1,5 +1,9 @@
 [
   { "name": "Sonicware Lofi-12 XT", "sampleRate": 24000, "bitDepth": 16, "channels": 1 },
   { "name": "Sonicware Lofi-12 (Original)", "sampleRate": 12000, "bitDepth": 16, "channels": 1 },
-  { "name": "Elektron Digitakt (Mk1)", "sampleRate": 44100, "bitDepth": 16, "channels": 1 }
+  { "name": "Elektron Digitakt (Mk1)", "sampleRate": 48000, "bitDepth": 16, "channels": 1 },
+  { "name": "Elektron Digitakt II", "sampleRate": 48000, "bitDepth": 16, "channels": 2 },
+  { "name": "Roland SP-404MKII", "sampleRate": 48000, "bitDepth": 16, "channels": 2 },
+  { "name": "Roland SP-404SX / SP-404A", "sampleRate": 44100, "bitDepth": 16, "channels": 2 },
+  { "name": "Polyend Tracker", "sampleRate": 44100, "bitDepth": 16, "channels": 1 }
 ]
