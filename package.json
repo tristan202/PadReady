@@ -1,14 +1,14 @@
 {
   "name": "padready",
   "productName": "PadReady",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Gets your samples ready for hardware samplers: batch conversion with device presets, powered by SoX.",
   "main": "src/main/main.js",
   "author": "tristan202",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tristan202/padready.git"
+    "url": "https://github.com/tristan202/PadReady.git"
   },
   "scripts": {
     "start": "electron .",

@@ -180,7 +180,7 @@ function registerIpc() {
         data: await fs.promises.readFile(file),
       })));
       const readme = [summary, '', `Converted with PadReady ${app.getVersion()}`,
-        'https://github.com/tristan202/padready', ''].join('\r\n');
+        'https://github.com/tristan202/PadReady', ''].join('\r\n');
       entries.push({ name: 'README.txt', data: Buffer.from(readme, 'utf8') });
       await fs.promises.writeFile(result.filePath, createZip(entries));
       return { saved: true, filePath: result.filePath };
