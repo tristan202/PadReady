@@ -4,11 +4,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const sox = require('../src/main/sox');
-const { Settings, parseIni } = require('../src/main/settings');
+const { Settings } = require('../src/main/settings');
 const { STRINGS } = require('../src/main/i18n');
 
 function tempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'sonicwaretool-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'padready-'));
 }
 
 // 16-bit PCM WAV: silence, a sine burst, then silence
@@ -91,23 +91,15 @@ test('expandPaths scans folders and skips non-audio files', () => {
   assert.deepStrictEqual(result, ['a.mp3', 'b.WAV']);
 });
 
-test('old PureBasic ini settings are imported', () => {
+test('settings are saved and bad values are ignored', () => {
   const dir = tempDir();
-  fs.writeFileSync(path.join(dir, 'lofi_config.ini'),
-    '\uFEFF\r\n[Settings]\r\nOutputDir = C:\\Out\\\r\nLanguage = Francais\r\nSampleRateIdx = 2\r\nNormalize = 1\r\nOpenDir = 0\r\n');
   const settings = new Settings(dir);
-  const values = settings.load();
-  assert.strictEqual(values.outputDir, 'C:\\Out\\');
-  assert.strictEqual(values.language, 'Francais');
-  assert.strictEqual(values.sampleRateIdx, 2);
-  assert.strictEqual(values.normalize, true);
-  assert.strictEqual(values.openDir, false);
+  settings.load();
   settings.update({ deviceIdx: 2, bogus: 1, normalize: 'yes' });
   const reloaded = new Settings(dir).load();
   assert.strictEqual(reloaded.deviceIdx, 2);
-  assert.strictEqual(reloaded.normalize, true);
+  assert.strictEqual(reloaded.normalize, false); // 'yes' is not a boolean, so it is ignored
   assert.ok(!('bogus' in reloaded));
-  assert.deepStrictEqual(parseIni('garbage'), {});
 });
 
 test('every language has every string', () => {

@@ -6,7 +6,7 @@ const { createZip } = require('./zip');
 const { Settings } = require('./settings');
 const { LANGUAGES, getStrings } = require('./i18n');
 
-app.setName('SonicwareTool');
+app.setName('PadReady');
 
 let mainWindow = null;
 let settings = null;
@@ -47,7 +47,7 @@ function showAbout() {
   return dialog.showMessageBox(mainWindow, {
     type: 'info',
     title: s.MenuAbout,
-    message: `Sonicware Lofi-12 XT Tool v${app.getVersion()}`,
+    message: `PadReady v${app.getVersion()}`,
     detail: `${s.AboutTxt}
 ${s.License}`,
   });
@@ -73,7 +73,7 @@ function createWindow() {
     minHeight: 600,
     backgroundColor: '#323232',
     autoHideMenuBar: true,
-    title: `Sonicware Lofi-12 XT Tool v${app.getVersion()}`,
+    title: `PadReady v${app.getVersion()}`,
     icon: path.join(__dirname, '..', 'renderer', 'icon.png'),
     show: false,
     webPreferences: {
@@ -179,8 +179,8 @@ function registerIpc() {
         name: path.basename(file),
         data: await fs.promises.readFile(file),
       })));
-      const readme = [summary, '', `Converted with SonicwareTool ${app.getVersion()}`,
-        'https://github.com/tristan202/sonicwaretool', ''].join('\r\n');
+      const readme = [summary, '', `Converted with PadReady ${app.getVersion()}`,
+        'https://github.com/tristan202/padready', ''].join('\r\n');
       entries.push({ name: 'README.txt', data: Buffer.from(readme, 'utf8') });
       await fs.promises.writeFile(result.filePath, createZip(entries));
       return { saved: true, filePath: result.filePath };
@@ -215,7 +215,7 @@ function registerIpc() {
 
 app.whenReady().then(() => {
   settings = new Settings(app.getPath('userData'), {
-    outputDir: path.join(app.getPath('documents'), 'XT_Export'),
+    outputDir: path.join(app.getPath('documents'), 'PadReady'),
   });
   settings.load();
   soxPath = resolveSoxPath(settings.values.soxPath);

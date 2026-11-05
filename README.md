@@ -1,10 +1,12 @@
-# Sonicware Lofi-12 XT Tool v2.0.0
+# PadReady v2.0.0
 
-A high-speed batch audio converter specifically designed for hardware samplers like the Sonicware Lofi-12 XT. Powered by the legendary SoX (Sound eXchange) engine for maximum precision and performance.
+Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
+
+PadReady was previously called the Sonicware Lofi-12 XT Tool.
 
 Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all hardware settings and the output folder are in the sidebar, and the main window has the file list, a waveform preview and a convert bar with a progress bar. The window can be resized, and the grey and orange colors are the same as before.
 
-<img width="816" alt="Screenshot of Sonicware Lofi-12 XT Tool v2.0.0" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.0.0" src="docs/screenshot.png" />
 
 ## 🚀 Features
 
@@ -42,18 +44,18 @@ Output is WAV or AIFF.
 
 ## 🛠 Installation
 
-1. **Download the tool:** Get the latest release from the [Releases](https://github.com/tristan202/sonicwaretool/releases) page:
-   - `SonicwareTool Setup x.y.z.exe` installs the tool for your user (no admin rights needed) with a Start menu and desktop shortcut. It can be removed again from Windows Settings > Apps.
-   - `SonicwareTool-x.y.z-portable.exe` runs without installing.
+1. **Download the tool:** Get the latest release from the [Releases](https://github.com/tristan202/padready/releases) page:
+   - `PadReady Setup x.y.z.exe` installs the tool for your user (no admin rights needed) with a Start menu and desktop shortcut. It can be removed again from Windows Settings > Apps.
+   - `PadReady-x.y.z-portable.exe` runs without installing.
 2. **Get SoX:** The tool requires `sox.exe` ([SoX](https://sourceforge.net/projects/sox/)) or `sox_ng.exe` ([SoX-NG](https://codeberg.org/sox_ng/sox_ng)). The tool looks for it in this order:
-   - the same folder as the tool (place `sox.exe` / `sox_ng.exe` and its `.dll` files there; for the installed version that is `%LOCALAPPDATA%\Programs\SonicwareTool`),
+   - the same folder as the tool (place `sox.exe` / `sox_ng.exe` and its `.dll` files there; for the installed version that is `%LOCALAPPDATA%\Programs\PadReady`),
    - `C:\Program Files (x86)\sox-14-4-2\`,
    - any folder on your `PATH`.
 
    If SoX can't be found, the tool asks you to locate it the first time you press **START CONVERSION**. MP3 and other compressed formats require a SoX build with support for those formats.
 3. **Run:** Open the tool and you are ready to go.
 
-Settings are stored in `%APPDATA%\SonicwareTool\settings.json` (settings from v1.x are imported automatically). Converted files go to `Documents\XT_Export` by default.
+Settings are stored in `%APPDATA%\PadReady\settings.json`. Converted files go to `Documents\PadReady` by default.
 
 ## 📖 How to Use
 
@@ -114,7 +116,7 @@ Device presets live in [`src/main/devices.json`](src/main/devices.json). To add 
 
 Please link the device's manual or spec page in the pull request so the values can be checked. `npm test` checks that every entry uses supported values. If your device needs a sample rate that isn't listed, add it to `SAMPLE_RATES` in `src/renderer/renderer.js` and to the test as well. Please also add a row to the table under Features.
 
-If you can't make a pull request, [open an issue](https://github.com/tristan202/sonicwaretool/issues) with the device name and its sample format.
+If you can't make a pull request, [open an issue](https://github.com/tristan202/padready/issues) with the device name and its sample format.
 
 ## 📜 License
 
