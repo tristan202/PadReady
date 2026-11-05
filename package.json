@@ -1,7 +1,7 @@
 {
   "name": "padready",
   "productName": "PadReady",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Gets your samples ready for hardware samplers: batch conversion with device presets, powered by SoX.",
   "main": "src/main/main.js",
   "author": "tristan202",
@@ -45,7 +45,8 @@
       "icon": "build/icon.png"
     },
     "nsis": {
-      "oneClick": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
       "perMachine": false,
       "deleteAppDataOnUninstall": false,
       "shortcutName": "PadReady",

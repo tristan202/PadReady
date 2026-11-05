@@ -33,7 +33,7 @@ button, input, select { font: inherit; color: inherit; }
 /* ---------- Sidebar ---------- */
 #sidebar { width: 280px; flex-shrink: 0; background: var(--sidebar); display: flex; flex-direction: column; border-right: 1px solid #1a1a1a; }
 .brand { padding: 16px 18px 12px; font-weight: 650; font-size: 16px; letter-spacing: .2px; display: flex; align-items: center; gap: 10px; }
-.brand-mark { font-family: var(--mono); font-size: 12px; background: var(--accent); color: var(--on-accent); font-weight: 700; border-radius: 6px; padding: 2px 6px; }
+.brand-mark { width: 26px; height: 26px; }
 .side-actions { display: flex; flex-direction: column; gap: 8px; padding: 0 12px 6px; }
 .side-scroll { flex: 1; overflow-y: auto; padding: 0 16px 14px; display: flex; flex-direction: column; gap: 10px; }
 .group-head { color: var(--muted); font-size: 11.5px; font-weight: 600; letter-spacing: .6px; padding: 14px 0 0; }

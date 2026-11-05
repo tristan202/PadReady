@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- PadReady: four sampler pads, one lit and ready. Source for build/icon.png and src/renderer/icon.png -->
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="#ff8700"/>
+  <rect x="40" y="40" width="80" height="80" rx="18" fill="#1e1e1e"/>
+  <rect x="136" y="40" width="80" height="80" rx="18" fill="#1e1e1e"/>
+  <rect x="40" y="136" width="80" height="80" rx="18" fill="#1e1e1e"/>
+  <rect x="136" y="136" width="80" height="80" rx="18" fill="#fff4e6"/>
+  <path d="M155 177 L171 193 L198 162" fill="none" stroke="#ff8700" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

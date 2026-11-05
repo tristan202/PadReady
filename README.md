@@ -1,4 +1,4 @@
-# PadReady v2.1.0
+# PadReady v2.1.1
 
 Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
 
@@ -6,7 +6,7 @@ PadReady was previously called the Sonicware Lofi-12 XT Tool.
 
 Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all hardware settings and the output folder are in the sidebar, and the main window has the file list, a waveform preview and a convert bar with a progress bar. The window can be resized, and the grey and orange colors are the same as before.
 
-<img width="816" alt="Screenshot of PadReady v2.1.0" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.1.1" src="docs/screenshot.png" />
 
 ## 🚀 Features
 
@@ -45,10 +45,10 @@ Output is WAV or AIFF.
 ## 🛠 Installation
 
 1. **Download the tool:** Get the latest release from the [Releases](https://github.com/tristan202/PadReady/releases) page:
-   - `PadReady Setup x.y.z.exe` installs the tool for your user (no admin rights needed) with a Start menu and desktop shortcut. It can be removed again from Windows Settings > Apps.
+   - `PadReady Setup x.y.z.exe` is a normal step-by-step installer: choose whether to install just for you (no admin rights needed) or for all users, and pick the install folder. It adds a Start menu and desktop shortcut, and can be removed again from Windows Settings > Apps.
    - `PadReady-x.y.z-portable.exe` runs without installing.
 2. **Get SoX:** The tool requires `sox.exe` ([SoX](https://sourceforge.net/projects/sox/)) or `sox_ng.exe` ([SoX-NG](https://codeberg.org/sox_ng/sox_ng)). The tool looks for it in this order:
-   - the same folder as the tool (place `sox.exe` / `sox_ng.exe` and its `.dll` files there; for the installed version that is `%LOCALAPPDATA%\Programs\PadReady`),
+   - the same folder as the tool (place `sox.exe` / `sox_ng.exe` and its `.dll` files there; for the installed version that is the folder you picked, by default `%LOCALAPPDATA%\Programs\PadReady` for just you or `C:\Program Files\PadReady` for all users),
    - `C:\Program Files (x86)\sox-14-4-2\`,
    - any folder on your `PATH`.
 
