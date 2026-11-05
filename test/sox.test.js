@@ -155,20 +155,24 @@ test('devices.json entries use values the app offers', () => {
   }
 });
 
-const { createZip } = require('../src/main/zip');
+const { writeZip } = require('../src/main/zip');
 const { spawnSync } = require('child_process');
 // bsdtar reads zip files (GNU tar from Git Bash does not), so use the one Windows ships
-const tar = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\Windows', 'System32', 'tar.exe') : 'bsdtar';
+const tar = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe') : 'bsdtar';
 const hasTar = spawnSync(tar, ['--version']).status === 0;
 
-test('createZip writes a zip that tar can extract', { skip: !hasTar && 'bsdtar not found' }, () => {
+test('writeZip writes a zip that tar can extract and reports progress', { skip: !hasTar && 'bsdtar not found' }, async () => {
   const dir = tempDir();
   const big = Buffer.alloc(100000, 7);
+  const kick = path.join(dir, 'kick.wav');
+  fs.writeFileSync(kick, big);
   const zipFile = path.join(dir, 'kit.zip');
-  fs.writeFileSync(zipFile, createZip([
-    { name: 'kick.wav', data: big },
+  const progress = [];
+  await writeZip(zipFile, [
+    { name: 'kick.wav', file: kick },
     { name: 'README.txt', data: Buffer.from('Lofi-12 XT · 24000 Hz') },
-  ]));
+  ], (done, total) => progress.push(`${done}/${total}`));
+  assert.deepStrictEqual(progress, ['1/2', '2/2']);
   const out = path.join(dir, 'out');
   fs.mkdirSync(out);
   const result = spawnSync(tar, ['-xf', zipFile, '-C', out]);
@@ -189,4 +193,11 @@ test('converts to AIFF for the OP-1 with SoX', { skip: !soxPath && 'SoX not foun
   const header = fs.readFileSync(path.join(dir, 'kick.aiff')).subarray(0, 12);
   assert.strictEqual(header.toString('ascii', 0, 4), 'FORM');
   assert.strictEqual(header.toString('ascii', 8, 12), 'AIFF');
+});
+
+test('writeZip removes the half-written zip when a file is missing', async () => {
+  const dir = tempDir();
+  const zipFile = path.join(dir, 'kit.zip');
+  await assert.rejects(writeZip(zipFile, [{ name: 'gone.wav', file: path.join(dir, 'gone.wav') }]));
+  assert.ok(!fs.existsSync(zipFile));
 });

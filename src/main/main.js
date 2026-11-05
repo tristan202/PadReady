@@ -2,7 +2,7 @@ const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require('electron')
 const fs = require('fs');
 const path = require('path');
 const sox = require('./sox');
-const { createZip } = require('./zip');
+const { writeZip } = require('./zip');
 const { Settings } = require('./settings');
 const { LANGUAGES, getStrings } = require('./i18n');
 
@@ -12,6 +12,7 @@ let mainWindow = null;
 let settings = null;
 let soxPath = '';
 let converting = false;
+let exporting = false;
 let currentChild = null;
 let lastOutputs = []; // files written by the last conversion, for Export as Zip
 
@@ -173,8 +174,8 @@ function registerIpc() {
 
   ipcMain.handle('open-path', (_e, dir) => shell.openPath(dir));
 
-  ipcMain.handle('export-zip', async (_e, { name, summary }) => {
-    if (converting || lastOutputs.length === 0) return { saved: false };
+  ipcMain.handle('export-zip', async (event, { name, summary }) => {
+    if (converting || exporting || lastOutputs.length === 0) return { saved: false };
     const s = strings();
     const result = await dialog.showSaveDialog(mainWindow, {
       title: s.BtnExport,
@@ -182,23 +183,26 @@ function registerIpc() {
       filters: [{ name: 'Zip', extensions: ['zip'] }],
     });
     if (result.canceled || !result.filePath) return { saved: false };
+    exporting = true;
+    const sender = event.sender;
     try {
-      const entries = await Promise.all(lastOutputs.map(async (file) => ({
-        name: path.basename(file),
-        data: await fs.promises.readFile(file),
-      })));
+      const entries = lastOutputs.map((file) => ({ name: path.basename(file), file }));
       const readme = [summary, '', `Converted with PadReady ${app.getVersion()}`,
         'https://github.com/tristan202/PadReady', ''].join('\r\n');
       entries.push({ name: 'README.txt', data: Buffer.from(readme, 'utf8') });
-      await fs.promises.writeFile(result.filePath, createZip(entries));
+      await writeZip(result.filePath, entries, (done, total) => {
+        if (!sender.isDestroyed()) sender.send('export-progress', { done, total });
+      });
       return { saved: true, filePath: result.filePath };
     } catch (err) {
       return { saved: false, error: err.message };
+    } finally {
+      exporting = false;
     }
   });
 
   ipcMain.handle('convert', async (event, job) => {
-    if (converting) return { started: false, reason: 'busy' };
+    if (converting || exporting) return { started: false, reason: 'busy' };
     if (!soxPath) return { started: false, reason: 'sox' };
     if (!sox.ensureDirectory(job.outputDir)) return { started: false, reason: 'output' };
     converting = true;

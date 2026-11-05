@@ -321,6 +321,11 @@ window.api.onConvertProgress((p) => {
   }
 });
 
+window.api.onExportProgress(({ done, total }) => {
+  setStatus(`${state.strings.StatusExporting}  ${done} ${state.strings.WordOf} ${total}`);
+  setProgress(done / total);
+});
+
 window.api.onConvertDone(({ failures, outputDir }) => {
   const s = state.strings;
   state.converting = false;
@@ -365,12 +370,24 @@ function bindEvents() {
   $('btnConvert').addEventListener('click', startConversion);
   $('btnExport').addEventListener('click', async () => {
     const s = state.strings;
+    // Busy like a conversion, so the status bar keeps showing export progress
+    state.converting = true;
+    $('btnExport').disabled = true;
+    $('btnConvert').disabled = true;
     const result = await window.api.exportZip({
       name: $('comboDevice').selectedOptions[0]?.textContent,
       summary: targetSummary(),
     });
-    if (result.saved) setStatus(s.MsgExportDone.replace('%FILE%', splitPath(result.filePath).name));
-    else if (result.error) window.alert(`${s.MsgExportError}\n${result.error}`);
+    state.converting = false;
+    $('btnExport').disabled = false;
+    $('btnConvert').disabled = false;
+    if (result.saved) {
+      setStatus(s.MsgExportDone.replace('%FILE%', splitPath(result.filePath).name));
+      setProgress(1, 'done');
+    } else {
+      showIdle();
+      if (result.error) window.alert(`${s.MsgExportError}\n${result.error}`);
+    }
   });
   $('btnAbout').addEventListener('click', () => window.api.showAbout());
   $('langSelect').addEventListener('change', async () => {

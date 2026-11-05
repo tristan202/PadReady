@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld('api', {
   exportZip: (info) => ipcRenderer.invoke('export-zip', info),
   pathForFile: (file) => webUtils.getPathForFile(file),
   onConvertProgress: (cb) => ipcRenderer.on('convert-progress', (_e, data) => cb(data)),
+  onExportProgress: (cb) => ipcRenderer.on('export-progress', (_e, data) => cb(data)),
   onConvertDone: (cb) => ipcRenderer.on('convert-done', (_e, data) => cb(data)),
 });

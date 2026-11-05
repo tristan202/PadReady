@@ -1,7 +1,13 @@
 // Minimal zip writer for exporting a kit. Node has deflate and CRC-32 built in, so no dependency.
+// Compression runs on Node's thread pool (async zlib) one file at a time, so the window stays
+// responsive and progress can be reported after each file.
 // shortcut: no ZIP64, so a kit must stay under 4 GB and 65535 files; add ZIP64 if that is ever hit.
 
+const fs = require('fs');
+const { promisify } = require('util');
 const zlib = require('zlib');
+
+const deflateRaw = promisify(zlib.deflateRaw);
 
 function dosDateTime(d) {
   return {
@@ -10,57 +16,68 @@ function dosDateTime(d) {
   };
 }
 
-// entries: [{ name, data: Buffer }] -> Buffer with a complete zip file
-function createZip(entries, now = new Date()) {
+// entries: [{ name, data: Buffer } or { name, file: path }]; onProgress(done, total) after each file.
+// Writes the zip to zipPath; a half-written zip is removed if anything fails.
+async function writeZip(zipPath, entries, onProgress, now = new Date()) {
   if (entries.length > 0xffff) throw new Error('Too many files for a zip without ZIP64');
   const { time, date } = dosDateTime(now);
-  const parts = [];
   const central = [];
   let offset = 0;
-  for (const { name, data } of entries) {
-    const nameBuf = Buffer.from(name, 'utf8');
-    const packed = zlib.deflateRawSync(data);
-    const crc = zlib.crc32(data);
+  const out = await fs.promises.open(zipPath, 'w');
+  try {
+    for (let i = 0; i < entries.length; i++) {
+      const { name, file } = entries[i];
+      const data = entries[i].data || await fs.promises.readFile(file);
+      const nameBuf = Buffer.from(name, 'utf8');
+      const packed = await deflateRaw(data);
+      const crc = zlib.crc32(data);
 
-    const local = Buffer.alloc(30);
-    local.writeUInt32LE(0x04034b50, 0);
-    local.writeUInt16LE(20, 4); // version needed to extract
-    local.writeUInt16LE(0x0800, 6); // names are UTF-8
-    local.writeUInt16LE(8, 8); // deflate
-    local.writeUInt16LE(time, 10);
-    local.writeUInt16LE(date, 12);
-    local.writeUInt32LE(crc, 14);
-    local.writeUInt32LE(packed.length, 18);
-    local.writeUInt32LE(data.length, 22);
-    local.writeUInt16LE(nameBuf.length, 26);
+      const local = Buffer.alloc(30);
+      local.writeUInt32LE(0x04034b50, 0);
+      local.writeUInt16LE(20, 4); // version needed to extract
+      local.writeUInt16LE(0x0800, 6); // names are UTF-8
+      local.writeUInt16LE(8, 8); // deflate
+      local.writeUInt16LE(time, 10);
+      local.writeUInt16LE(date, 12);
+      local.writeUInt32LE(crc, 14);
+      local.writeUInt32LE(packed.length, 18);
+      local.writeUInt32LE(data.length, 22);
+      local.writeUInt16LE(nameBuf.length, 26);
 
-    const entry = Buffer.alloc(46);
-    entry.writeUInt32LE(0x02014b50, 0);
-    entry.writeUInt16LE(20, 4); // version made by
-    entry.writeUInt16LE(20, 6); // version needed to extract
-    entry.writeUInt16LE(0x0800, 8);
-    entry.writeUInt16LE(8, 10);
-    entry.writeUInt16LE(time, 12);
-    entry.writeUInt16LE(date, 14);
-    entry.writeUInt32LE(crc, 16);
-    entry.writeUInt32LE(packed.length, 20);
-    entry.writeUInt32LE(data.length, 24);
-    entry.writeUInt16LE(nameBuf.length, 28);
-    entry.writeUInt32LE(offset, 42);
+      const entry = Buffer.alloc(46);
+      entry.writeUInt32LE(0x02014b50, 0);
+      entry.writeUInt16LE(20, 4); // version made by
+      entry.writeUInt16LE(20, 6); // version needed to extract
+      entry.writeUInt16LE(0x0800, 8);
+      entry.writeUInt16LE(8, 10);
+      entry.writeUInt16LE(time, 12);
+      entry.writeUInt16LE(date, 14);
+      entry.writeUInt32LE(crc, 16);
+      entry.writeUInt32LE(packed.length, 20);
+      entry.writeUInt32LE(data.length, 24);
+      entry.writeUInt16LE(nameBuf.length, 28);
+      entry.writeUInt32LE(offset, 42);
 
-    parts.push(local, nameBuf, packed);
-    central.push(entry, nameBuf);
-    offset += local.length + nameBuf.length + packed.length;
-    if (offset > 0xffffffff) throw new Error('Kit is too large for a zip without ZIP64');
+      await out.writev([local, nameBuf, packed]);
+      central.push(entry, nameBuf);
+      offset += local.length + nameBuf.length + packed.length;
+      if (offset > 0xffffffff) throw new Error('Kit is too large for a zip without ZIP64');
+      if (onProgress) onProgress(i + 1, entries.length);
+    }
+    const centralSize = central.reduce((n, b) => n + b.length, 0);
+    const end = Buffer.alloc(22);
+    end.writeUInt32LE(0x06054b50, 0);
+    end.writeUInt16LE(entries.length, 8);
+    end.writeUInt16LE(entries.length, 10);
+    end.writeUInt32LE(centralSize, 12);
+    end.writeUInt32LE(offset, 16);
+    await out.writev([...central, end]);
+    await out.close();
+  } catch (err) {
+    await out.close().catch(() => {});
+    await fs.promises.rm(zipPath, { force: true });
+    throw err;
   }
-  const centralSize = central.reduce((n, b) => n + b.length, 0);
-  const end = Buffer.alloc(22);
-  end.writeUInt32LE(0x06054b50, 0);
-  end.writeUInt16LE(entries.length, 8);
-  end.writeUInt16LE(entries.length, 10);
-  end.writeUInt32LE(centralSize, 12);
-  end.writeUInt32LE(offset, 16);
-  return Buffer.concat([...parts, ...central, end]);
 }
 
-module.exports = { createZip };
+module.exports = { writeZip };
