@@ -11,6 +11,7 @@ const DEFAULTS = {
   sampleRateIdx: 1,
   bitDepthIdx: 0,
   channelsIdx: 0,
+  formatIdx: 0,
   normalize: false,
   autoTrim: false,
   reverse: false,

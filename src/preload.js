@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('api', {
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   openPath: (dir) => ipcRenderer.invoke('open-path', dir),
   convert: (job) => ipcRenderer.invoke('convert', job),
+  exportZip: (info) => ipcRenderer.invoke('export-zip', info),
   pathForFile: (file) => webUtils.getPathForFile(file),
   onConvertProgress: (cb) => ipcRenderer.on('convert-progress', (_e, data) => cb(data)),
   onConvertDone: (cb) => ipcRenderer.on('convert-done', (_e, data) => cb(data)),

@@ -6,6 +6,7 @@ let DEVICES = []; // loaded from src/main/devices.json
 const SAMPLE_RATES = ['12000', '24000', '44100', '48000'];
 const BIT_DEPTHS = [{ label: '16-bit', value: 16 }, { label: '24-bit', value: 24 }];
 const CHANNELS = [{ label: 'Mono', value: 1 }, { label: 'Stereo', value: 2 }];
+const FORMATS = [{ label: 'WAV', value: 'wav' }, { label: 'AIFF', value: 'aiff' }];
 
 const COLORS = {
   accent: 'rgb(255, 135, 0)',
@@ -58,6 +59,7 @@ function targetSummary() {
     `${SAMPLE_RATES[$('comboSampleRate').selectedIndex]} Hz`,
     BIT_DEPTHS[$('comboBitDepth').selectedIndex].label,
     CHANNELS[$('comboChannels').selectedIndex].label,
+    FORMATS[$('comboFormat').selectedIndex].label,
   ].filter(Boolean).join('  ·  ');
 }
 
@@ -98,9 +100,9 @@ function applyStrings(strings) {
     btnAddFiles: s.BtnFiles, btnAddFolder: s.BtnFolder, btnClear: s.BtnClear,
     txtFrameOutput: s.FrameOut, btnSetOutputDir: s.BtnChange,
     txtFrameSettings: s.FrameSet, lblDevice: s.LabelDev, lblSampleRate: s.LabelSR,
-    lblBitDepth: s.LabelBD, lblChannels: s.LabelCH,
+    lblBitDepth: s.LabelBD, lblChannels: s.LabelCH, lblFormat: s.LabelFmt,
     lblNormalize: s.CheckNorm, lblAutoTrim: s.CheckTrim, lblReverse: s.CheckReverse,
-    lblOpenDir: s.CheckOpenDir, btnConvert: s.BtnStart,
+    lblOpenDir: s.CheckOpenDir, btnConvert: s.BtnStart, btnExport: s.BtnExport,
     txtEmptyTitle: s.EmptyTitle, txtEmptyText: s.EmptyText,
   };
   for (const [id, value] of Object.entries(text)) $(id).textContent = value;
@@ -267,6 +269,7 @@ function currentJob() {
     sampleRate: SAMPLE_RATES[$('comboSampleRate').selectedIndex],
     bitDepth: BIT_DEPTHS[$('comboBitDepth').selectedIndex].value,
     channels: CHANNELS[$('comboChannels').selectedIndex].value,
+    format: FORMATS[$('comboFormat').selectedIndex].value,
     normalize: $('checkNormalize').checked,
     autoTrim: $('checkAutoTrim').checked,
     reverse: $('checkReverse').checked,
@@ -294,6 +297,7 @@ async function startConversion() {
   state.converting = true;
   state.total = job.files.length;
   $('btnConvert').disabled = true;
+  $('btnExport').disabled = true;
   setStatus(s.StatusConverting);
   setProgress(0);
   const result = await window.api.convert(job);
@@ -321,6 +325,7 @@ window.api.onConvertDone(({ failures, outputDir }) => {
   const s = state.strings;
   state.converting = false;
   $('btnConvert').disabled = false;
+  $('btnExport').disabled = !state.files.some((f) => f.done);
   if (failures.length > 0) {
     setStatus(s.MsgDoneErrors.replace('%ERRORS%', String(failures.length)), 'warning');
     setProgress(1, 'warn');
@@ -358,6 +363,15 @@ function bindEvents() {
     }
   });
   $('btnConvert').addEventListener('click', startConversion);
+  $('btnExport').addEventListener('click', async () => {
+    const s = state.strings;
+    const result = await window.api.exportZip({
+      name: $('comboDevice').selectedOptions[0]?.textContent,
+      summary: targetSummary(),
+    });
+    if (result.saved) setStatus(s.MsgExportDone.replace('%FILE%', splitPath(result.filePath).name));
+    else if (result.error) window.alert(`${s.MsgExportError}\n${result.error}`);
+  });
   $('btnAbout').addEventListener('click', () => window.api.showAbout());
   $('langSelect').addEventListener('change', async () => {
     applyStrings(await window.api.setLanguage($('langSelect').value));
@@ -385,14 +399,16 @@ function bindEvents() {
       sampleRateIdx: SAMPLE_RATES.indexOf(String(device.sampleRate)),
       bitDepthIdx: BIT_DEPTHS.findIndex((b) => b.value === device.bitDepth),
       channelsIdx: CHANNELS.findIndex((c) => c.value === device.channels),
+      formatIdx: FORMATS.findIndex((f) => f.value === (device.format || 'wav')),
     };
     $('comboSampleRate').selectedIndex = idx.sampleRateIdx;
     $('comboBitDepth').selectedIndex = idx.bitDepthIdx;
     $('comboChannels').selectedIndex = idx.channelsIdx;
+    $('comboFormat').selectedIndex = idx.formatIdx;
     save({ deviceIdx: $('comboDevice').selectedIndex, ...idx });
     showIdle();
   });
-  const selects = { comboSampleRate: 'sampleRateIdx', comboBitDepth: 'bitDepthIdx', comboChannels: 'channelsIdx' };
+  const selects = { comboSampleRate: 'sampleRateIdx', comboBitDepth: 'bitDepthIdx', comboChannels: 'channelsIdx', comboFormat: 'formatIdx' };
   for (const [id, key] of Object.entries(selects)) {
     $(id).addEventListener('change', () => {
       save({ [key]: $(id).selectedIndex });
@@ -444,12 +460,14 @@ async function init() {
   fillSelect($('comboSampleRate'), SAMPLE_RATES);
   fillSelect($('comboBitDepth'), BIT_DEPTHS.map((b) => b.label));
   fillSelect($('comboChannels'), CHANNELS.map((c) => c.label));
+  fillSelect($('comboFormat'), FORMATS.map((f) => f.label));
   $('langSelect').replaceChildren(...languages.map((l) => new Option(l.label, l.key)));
   $('langSelect').value = settings.language;
   $('comboDevice').selectedIndex = clampIndex(settings.deviceIdx, DEVICES.length);
   $('comboSampleRate').selectedIndex = clampIndex(settings.sampleRateIdx, SAMPLE_RATES.length);
   $('comboBitDepth').selectedIndex = clampIndex(settings.bitDepthIdx, BIT_DEPTHS.length);
   $('comboChannels').selectedIndex = clampIndex(settings.channelsIdx, CHANNELS.length);
+  $('comboFormat').selectedIndex = clampIndex(settings.formatIdx, FORMATS.length);
   $('checkNormalize').checked = settings.normalize;
   $('checkAutoTrim').checked = settings.autoTrim;
   $('checkReverse').checked = settings.reverse;

@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require('electron')
 const fs = require('fs');
 const path = require('path');
 const sox = require('./sox');
+const { createZip } = require('./zip');
 const { Settings } = require('./settings');
 const { LANGUAGES, getStrings } = require('./i18n');
 
@@ -12,6 +13,7 @@ let settings = null;
 let soxPath = '';
 let converting = false;
 let currentChild = null;
+let lastOutputs = []; // files written by the last conversion, for Export as Zip
 
 // Folders searched for sox_ng/sox before the default install folder and PATH
 function appDirs() {
@@ -163,16 +165,44 @@ function registerIpc() {
 
   ipcMain.handle('open-path', (_e, dir) => shell.openPath(dir));
 
+  ipcMain.handle('export-zip', async (_e, { name, summary }) => {
+    if (converting || lastOutputs.length === 0) return { saved: false };
+    const s = strings();
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: s.BtnExport,
+      defaultPath: path.join(settings.values.outputDir, `${sox.cleanFileName(name || 'kit')}_kit.zip`),
+      filters: [{ name: 'Zip', extensions: ['zip'] }],
+    });
+    if (result.canceled || !result.filePath) return { saved: false };
+    try {
+      const entries = await Promise.all(lastOutputs.map(async (file) => ({
+        name: path.basename(file),
+        data: await fs.promises.readFile(file),
+      })));
+      const readme = [summary, '', `Converted with SonicwareTool ${app.getVersion()}`,
+        'https://github.com/tristan202/sonicwaretool', ''].join('\r\n');
+      entries.push({ name: 'README.txt', data: Buffer.from(readme, 'utf8') });
+      await fs.promises.writeFile(result.filePath, createZip(entries));
+      return { saved: true, filePath: result.filePath };
+    } catch (err) {
+      return { saved: false, error: err.message };
+    }
+  });
+
   ipcMain.handle('convert', async (event, job) => {
     if (converting) return { started: false, reason: 'busy' };
     if (!soxPath) return { started: false, reason: 'sox' };
     if (!sox.ensureDirectory(job.outputDir)) return { started: false, reason: 'output' };
     converting = true;
+    lastOutputs = [];
     const sender = event.sender;
     const send = (channel, data) => {
       if (!sender.isDestroyed()) sender.send(channel, data);
     };
-    sox.convertAll({ ...job, soxPath }, (progress) => send('convert-progress', progress), (child) => {
+    sox.convertAll({ ...job, soxPath }, (progress) => {
+      if (progress.ok) lastOutputs.push(progress.output);
+      send('convert-progress', progress);
+    }, (child) => {
       currentChild = child;
     }).then((failures) => {
       converting = false;

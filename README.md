@@ -11,23 +11,26 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
 - **Batch processing:** Drag and drop multiple files or entire folders (WAV, MP3, FLAC, OGG, WMA, M4A).
 - **Hardware profiles:** One-click presets for:
 
-  | Device | Sample rate | Bit depth | Channels |
-  | --- | --- | --- | --- |
-  | Sonicware Lofi-12 XT | 24 kHz | 16-bit | Mono |
-  | Sonicware Lofi-12 (Original) | 12 kHz | 16-bit | Mono |
-  | Elektron Digitakt (Mk1) | 48 kHz | 16-bit | Mono |
-  | Elektron Digitakt II | 48 kHz | 16-bit | Stereo |
-  | Roland SP-404MKII | 48 kHz | 16-bit | Stereo |
-  | Roland SP-404SX / SP-404A | 44.1 kHz | 16-bit | Stereo |
-  | Polyend Tracker | 44.1 kHz | 16-bit | Mono |
+  | Device | Sample rate | Bit depth | Channels | Format |
+  | --- | --- | --- | --- | --- |
+  | Sonicware Lofi-12 XT | 24 kHz | 16-bit | Mono | WAV |
+  | Sonicware Lofi-12 (Original) | 12 kHz | 16-bit | Mono | WAV |
+  | Elektron Digitakt (Mk1) | 48 kHz | 16-bit | Mono | WAV |
+  | Elektron Digitakt II | 48 kHz | 16-bit | Stereo | WAV |
+  | Roland SP-404MKII | 48 kHz | 16-bit | Stereo | WAV |
+  | Roland SP-404SX / SP-404A | 44.1 kHz | 16-bit | Stereo | WAV |
+  | Polyend Tracker | 44.1 kHz | 16-bit | Mono | WAV |
+  | Teenage Engineering OP-1 / OP-1 field | 44.1 kHz | 16-bit | Mono | AIFF |
+  | Teenage Engineering OP-Z | 44.1 kHz | 16-bit | Mono | AIFF |
 
-  You can also pick sample rate (12/24/44.1/48 kHz), bit depth (16/24-bit) and channels (mono/stereo) by hand.
+  You can also pick sample rate (12/24/44.1/48 kHz), bit depth (16/24-bit), channels (mono/stereo) and format (WAV/AIFF) by hand.
 
   Missing your sampler? [Add it](#-adding-your-device) — it's one line.
 - **Smart filenames:** Replaces spaces and invalid characters with underscores and never overwrites existing files (a numbered suffix is added instead).
 - **Normalize:** Peak normalization to 0 dB for consistent volume across all your samples.
 - **Auto-Trim:** Removes silence at the start and end of each sample.
 - **Reverse:** Reverses samples during conversion (output files get a `_rev` suffix).
+- **Export as Zip:** Packs the files from the last conversion into one zip file, ready to share as a kit. The zip includes a `README.txt` with the device and settings the kit was made for.
 - **Preview:** Click a file to play it and see its waveform (WAV, MP3, FLAC, OGG and M4A; WMA can be converted but not previewed).
 - **Blazing fast:** Uses the SoX engine and converts in the background, so the window stays responsive.
 - **Clear errors:** Converted files get a ✓ and files that fail are highlighted in the list; hover over one to see the SoX error message.
@@ -35,7 +38,7 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
 - **Multilingual:** English, Danish, German, Spanish, French, Italian and Swedish (switch with the language picker at the bottom of the sidebar).
 - **Open source:** Free to use, modify, and distribute.
 
-Output is always WAV.
+Output is WAV or AIFF.
 
 ## 🛠 Installation
 
@@ -58,6 +61,7 @@ Settings are stored in `%APPDATA%\SonicwareTool\settings.json` (settings from v1
 2. **Set output:** Choose where you want your converted samples to be saved with **Change Folder**.
 3. **Adjust settings:** Pick a target hardware profile, or select sample rate, bit depth and channels yourself. Enable **Normalize**, **Auto-Trim** or **Reverse** as needed.
 4. **Convert:** Hit **START CONVERSION**. Progress is shown below the settings, along with the number of failed files, if any. Enable **Open folder when done** to have the output folder open automatically.
+5. **Share (optional):** Click **Export as Zip** to save the converted files as one zip file you can share with other owners of the same sampler.
 
 ## 🧑‍💻 Building from Source
 
@@ -106,6 +110,7 @@ Device presets live in [`src/main/devices.json`](src/main/devices.json). To add 
 - `sampleRate`: 12000, 24000, 44100 or 48000
 - `bitDepth`: 16 or 24
 - `channels`: 1 (mono) or 2 (stereo)
+- `format` (optional): `"wav"` (default) or `"aiff"`
 
 Please link the device's manual or spec page in the pull request so the values can be checked. `npm test` checks that every entry uses supported values. If your device needs a sample rate that isn't listed, add it to `SAMPLE_RATES` in `src/renderer/renderer.js` and to the test as well. Please also add a row to the table under Features.
 

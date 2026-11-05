@@ -67,6 +67,7 @@ test('uniqueOutputName adds a counter instead of overwriting', () => {
   assert.strictEqual(path.basename(first), 'kick_rev.wav');
   fs.writeFileSync(first, '');
   assert.strictEqual(path.basename(sox.uniqueOutputName(dir, 'kick', '_rev')), 'kick_rev_001.wav');
+  assert.strictEqual(path.basename(sox.uniqueOutputName(dir, 'kick', '', 'aiff')), 'kick.aiff');
 });
 
 test('buildArgs matches the original SoX command line', () => {
@@ -158,5 +159,42 @@ test('devices.json entries use values the app offers', () => {
     assert.ok([12000, 24000, 44100, 48000].includes(d.sampleRate), `${d.name}: sampleRate ${d.sampleRate}`);
     assert.ok([16, 24].includes(d.bitDepth), `${d.name}: bitDepth ${d.bitDepth}`);
     assert.ok([1, 2].includes(d.channels), `${d.name}: channels ${d.channels}`);
+    assert.ok([undefined, 'wav', 'aiff'].includes(d.format), `${d.name}: format ${d.format}`);
   }
+});
+
+const { createZip } = require('../src/main/zip');
+const { spawnSync } = require('child_process');
+// bsdtar reads zip files (GNU tar from Git Bash does not), so use the one Windows ships
+const tar = process.platform === 'win32' ? path.join(process.env.SystemRoot || 'C:\Windows', 'System32', 'tar.exe') : 'bsdtar';
+const hasTar = spawnSync(tar, ['--version']).status === 0;
+
+test('createZip writes a zip that tar can extract', { skip: !hasTar && 'bsdtar not found' }, () => {
+  const dir = tempDir();
+  const big = Buffer.alloc(100000, 7);
+  const zipFile = path.join(dir, 'kit.zip');
+  fs.writeFileSync(zipFile, createZip([
+    { name: 'kick.wav', data: big },
+    { name: 'README.txt', data: Buffer.from('Lofi-12 XT · 24000 Hz') },
+  ]));
+  const out = path.join(dir, 'out');
+  fs.mkdirSync(out);
+  const result = spawnSync(tar, ['-xf', zipFile, '-C', out]);
+  assert.strictEqual(result.status, 0, String(result.stderr));
+  assert.ok(fs.readFileSync(path.join(out, 'kick.wav')).equals(big));
+  assert.strictEqual(fs.readFileSync(path.join(out, 'README.txt'), 'utf8'), 'Lofi-12 XT · 24000 Hz');
+});
+
+test('converts to AIFF for the OP-1 with SoX', { skip: !soxPath && 'SoX not found' }, async () => {
+  const dir = tempDir();
+  const input = path.join(dir, 'kick.wav');
+  writeTestWav(input);
+  const failures = await sox.convertAll({
+    soxPath, files: [input], outputDir: dir, format: 'aiff',
+    sampleRate: '44100', bitDepth: 16, channels: 1, normalize: false, autoTrim: false, reverse: false,
+  });
+  assert.deepStrictEqual(failures, []);
+  const header = fs.readFileSync(path.join(dir, 'kick.aiff')).subarray(0, 12);
+  assert.strictEqual(header.toString('ascii', 0, 4), 'FORM');
+  assert.strictEqual(header.toString('ascii', 8, 12), 'AIFF');
 });

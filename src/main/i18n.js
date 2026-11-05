@@ -40,6 +40,8 @@ const STRINGS = {
     MenuLang: 'Language', MenuHelp: 'Help', MenuAbout: 'About',
     TipPlay: 'Play Sample', TipStop: 'Stop Playback',
     FilterAudio: 'Audio Files', FilterAll: 'All Files', FindSox: 'Find SoX / SoX-NG...',
+    LabelFmt: 'Format:', BtnExport: 'Export as Zip',
+    MsgExportDone: 'Kit saved: %FILE%', MsgExportError: 'Could not save the zip file.',
     EmptyTitle: 'Drop audio files here', EmptyText: 'Drag files or folders onto the window, or use the buttons on the left.',
   },
   Dansk: {
@@ -63,6 +65,8 @@ const STRINGS = {
     MenuLang: 'Sprog', MenuHelp: 'Hjælp', MenuAbout: 'Om',
     TipPlay: 'Afspil sample', TipStop: 'Stop afspilning',
     FilterAudio: 'Lydfiler', FilterAll: 'Alle filer', FindSox: 'Find SoX / SoX-NG...',
+    LabelFmt: 'Format:', BtnExport: 'Eksportér som zip',
+    MsgExportDone: 'Kit gemt: %FILE%', MsgExportError: 'Zip-filen kunne ikke gemmes.',
     EmptyTitle: 'Træk lydfiler hertil', EmptyText: 'Træk filer eller mapper ind i vinduet, eller brug knapperne til venstre.',
   },
   Deutsch: {
@@ -86,6 +90,8 @@ const STRINGS = {
     MenuLang: 'Sprache', MenuHelp: 'Hilfe', MenuAbout: 'Über',
     TipPlay: 'Sample abspielen', TipStop: 'Wiedergabe stoppen',
     FilterAudio: 'Audiodateien', FilterAll: 'Alle Dateien', FindSox: 'SoX / SoX-NG suchen...',
+    LabelFmt: 'Format:', BtnExport: 'Als Zip exportieren',
+    MsgExportDone: 'Kit gespeichert: %FILE%', MsgExportError: 'Die Zip-Datei konnte nicht gespeichert werden.',
     EmptyTitle: 'Audiodateien hierher ziehen', EmptyText: 'Ziehe Dateien oder Ordner in das Fenster oder nutze die Schaltflächen links.',
   },
   Espanol: {
@@ -109,6 +115,8 @@ const STRINGS = {
     MenuLang: 'Idioma', MenuHelp: 'Ayuda', MenuAbout: 'Acerca de',
     TipPlay: 'Reproducir sample', TipStop: 'Detener reproducción',
     FilterAudio: 'Archivos de audio', FilterAll: 'Todos los archivos', FindSox: 'Buscar SoX / SoX-NG...',
+    LabelFmt: 'Formato:', BtnExport: 'Exportar como zip',
+    MsgExportDone: 'Kit guardado: %FILE%', MsgExportError: 'No se pudo guardar el archivo zip.',
     EmptyTitle: 'Arrastra archivos de audio aquí', EmptyText: 'Arrastra archivos o carpetas a la ventana o usa los botones de la izquierda.',
   },
   Francais: {
@@ -132,6 +140,8 @@ const STRINGS = {
     MenuLang: 'Langue', MenuHelp: 'Aide', MenuAbout: 'À propos',
     TipPlay: 'Écouter le sample', TipStop: 'Arrêter la lecture',
     FilterAudio: 'Fichiers audio', FilterAll: 'Tous les fichiers', FindSox: 'Trouver SoX / SoX-NG...',
+    LabelFmt: 'Format :', BtnExport: 'Exporter en zip',
+    MsgExportDone: 'Kit enregistré : %FILE%', MsgExportError: "Impossible d'enregistrer le fichier zip.",
     EmptyTitle: 'Déposez vos fichiers audio ici', EmptyText: 'Glissez des fichiers ou dossiers dans la fenêtre, ou utilisez les boutons à gauche.',
   },
   Italiano: {
@@ -155,6 +165,8 @@ const STRINGS = {
     MenuLang: 'Lingua', MenuHelp: 'Aiuto', MenuAbout: 'Informazioni',
     TipPlay: 'Riproduci sample', TipStop: 'Interrompi riproduzione',
     FilterAudio: 'File audio', FilterAll: 'Tutti i file', FindSox: 'Trova SoX / SoX-NG...',
+    LabelFmt: 'Formato:', BtnExport: 'Esporta come zip',
+    MsgExportDone: 'Kit salvato: %FILE%', MsgExportError: 'Impossibile salvare il file zip.',
     EmptyTitle: 'Trascina qui i file audio', EmptyText: 'Trascina file o cartelle nella finestra oppure usa i pulsanti a sinistra.',
   },
   Svenska: {
@@ -178,6 +190,8 @@ const STRINGS = {
     MenuLang: 'Språk', MenuHelp: 'Hjälp', MenuAbout: 'Om',
     TipPlay: 'Spela upp sample', TipStop: 'Stoppa uppspelning',
     FilterAudio: 'Ljudfiler', FilterAll: 'Alla filer', FindSox: 'Hitta SoX / SoX-NG...',
+    LabelFmt: 'Format:', BtnExport: 'Exportera som zip',
+    MsgExportDone: 'Kit sparat: %FILE%', MsgExportError: 'Zip-filen kunde inte sparas.',
     EmptyTitle: 'Dra ljudfiler hit', EmptyText: 'Dra filer eller mappar till fönstret, eller använd knapparna till vänster.',
   },
 };

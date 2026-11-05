@@ -78,12 +78,12 @@ function cleanFileName(fullPath) {
   return cleaned || 'sample';
 }
 
-function uniqueOutputName(outputDir, baseName, suffix) {
+function uniqueOutputName(outputDir, baseName, suffix, ext = 'wav') {
   let counter = 0;
   for (;;) {
     const name = counter === 0
-      ? `${baseName}${suffix}.wav`
-      : `${baseName}${suffix}_${String(counter).padStart(3, '0')}.wav`;
+      ? `${baseName}${suffix}.${ext}`
+      : `${baseName}${suffix}_${String(counter).padStart(3, '0')}.${ext}`;
     const candidate = path.join(outputDir, name);
     if (!fs.existsSync(candidate)) return candidate;
     counter++;
@@ -143,7 +143,7 @@ async function convertAll(job, onProgress, onSpawn) {
   const failures = [];
   for (let i = 0; i < job.files.length; i++) {
     const input = job.files[i];
-    const output = uniqueOutputName(job.outputDir, cleanFileName(input), suffix);
+    const output = uniqueOutputName(job.outputDir, cleanFileName(input), suffix, job.format || 'wav');
     const result = await runSox(job.soxPath, buildArgs(input, output, job), onSpawn);
     if (!result.ok) failures.push({ file: input, error: result.error });
     if (onProgress) onProgress({ index: i + 1, total: job.files.length, file: input, output, ...result });
