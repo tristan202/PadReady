@@ -6,6 +6,7 @@ const COMMON = {
   CheckTrim: 'Auto-Trim',
   CheckReverse: 'Reverse',
   License: 'Open Source (GPL-3.0) - tristan202',
+  SoxNotice: 'Includes SoX-NG 14.7.2 (GPL-2.0), source: https://codeberg.org/sox_ng/sox_ng',
 };
 
 const LANGUAGES = [

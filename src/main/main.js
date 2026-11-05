@@ -25,13 +25,20 @@ function appDirs() {
   return [...new Set(dirs)];
 }
 
+// SoX-NG bundled by scripts/fetch-sox.js; only used when no other SoX is found, so the user's own SoX wins
+function bundledSox() {
+  const dir = app.isPackaged ? path.join(process.resourcesPath, 'sox') : path.join(app.getAppPath(), 'vendor', 'sox');
+  const exe = path.join(dir, process.platform === 'win32' ? 'sox_ng.exe' : 'sox_ng');
+  return fs.existsSync(exe) ? exe : '';
+}
+
 function resolveSoxPath(saved) {
   if (saved) {
     const candidates = path.isAbsolute(saved) ? [saved] : appDirs().map((d) => path.join(d, saved));
     const found = candidates.find((p) => fs.existsSync(p));
     if (found) return found;
   }
-  return sox.findSox(appDirs());
+  return sox.findSox(appDirs()) || bundledSox();
 }
 
 function strings() {
@@ -49,7 +56,8 @@ function showAbout() {
     title: s.MenuAbout,
     message: `PadReady v${app.getVersion()}`,
     detail: `${s.AboutTxt}
-${s.License}`,
+${s.License}
+${s.SoxNotice}`,
   });
 }
 

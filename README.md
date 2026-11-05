@@ -1,4 +1,4 @@
-# PadReady v2.1.1
+# PadReady v2.1.2
 
 Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
 
@@ -6,11 +6,11 @@ PadReady was previously called the Sonicware Lofi-12 XT Tool.
 
 Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all hardware settings and the output folder are in the sidebar, and the main window has the file list, a waveform preview and a convert bar with a progress bar. The window can be resized, and the grey and orange colors are the same as before.
 
-<img width="816" alt="Screenshot of PadReady v2.1.1" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.1.2" src="docs/screenshot.png" />
 
 ## 🚀 Features
 
-- **Batch processing:** Drag and drop multiple files or entire folders (WAV, MP3, FLAC, OGG, WMA, M4A).
+- **Batch processing:** Drag and drop multiple files or entire folders (WAV, AIFF, MP3, FLAC, OGG; WMA and M4A need [ffmpeg](#-installation)).
 - **Hardware profiles:** One-click presets for:
 
   | Device | Sample rate | Bit depth | Channels | Format |
@@ -47,12 +47,13 @@ Output is WAV or AIFF.
 1. **Download the tool:** Get the latest release from the [Releases](https://github.com/tristan202/PadReady/releases) page:
    - `PadReady Setup x.y.z.exe` is a normal step-by-step installer: choose whether to install just for you (no admin rights needed) or for all users, and pick the install folder. It adds a Start menu and desktop shortcut, and can be removed again from Windows Settings > Apps.
    - `PadReady-x.y.z-portable.exe` runs without installing.
-2. **Get SoX:** The tool requires `sox.exe` ([SoX](https://sourceforge.net/projects/sox/)) or `sox_ng.exe` ([SoX-NG](https://codeberg.org/sox_ng/sox_ng)). The tool looks for it in this order:
-   - the same folder as the tool (place `sox.exe` / `sox_ng.exe` and its `.dll` files there; for the installed version that is the folder you picked, by default `%LOCALAPPDATA%\Programs\PadReady` for just you or `C:\Program Files\PadReady` for all users),
-   - `C:\Program Files (x86)\sox-14-4-2\`,
-   - any folder on your `PATH`.
+2. **SoX is included:** PadReady comes with [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2, the audio engine that does the conversion, so there is nothing else to install. It reads WAV, AIFF, MP3, FLAC and OGG.
 
-   If SoX can't be found, the tool asks you to locate it the first time you press **START CONVERSION**. MP3 and other compressed formats require a SoX build with support for those formats.
+   To use your own SoX instead (for example a build that also reads WMA and M4A through ffmpeg), place `sox.exe` or `sox_ng.exe` and its `.dll` files in the folder you installed PadReady to. The tool looks for SoX in this order:
+   - the same folder as the tool (for the installed version that is the folder you picked, by default `%LOCALAPPDATA%\Programs\PadReady` for just you or `C:\Program Files\PadReady` for all users),
+   - `C:\Program Files (x86)\sox-14-4-2\`,
+   - any folder on your `PATH`,
+   - the SoX-NG that comes with PadReady.
 3. **Run:** Open the tool and you are ready to go.
 
 Settings are stored in `%APPDATA%\PadReady\settings.json`. Converted files go to `Documents\PadReady` by default.
@@ -73,7 +74,7 @@ You need [Node.js](https://nodejs.org/) 20 or newer.
 npm install
 ```
 
-Run the app (it finds `sox.exe` / `sox_ng.exe` in the project folder, or on your `PATH`):
+Run the app (it finds `sox.exe` / `sox_ng.exe` in the project folder, on your `PATH`, or in `vendor/sox` after `npm run fetch-sox`):
 
 ```bash
 npm start
@@ -85,7 +86,7 @@ Run the tests (the conversion test is skipped if SoX isn't found):
 npm test
 ```
 
-Build the Windows installer into `dist/`:
+Build the Windows installer into `dist/`. This first runs `npm run fetch-sox`, which downloads the official SoX-NG Windows build and its source code from Codeberg into `vendor/` and checks their SHA-256 checksums, so SoX is bundled with the app:
 
 ```bash
 npm run dist
@@ -123,6 +124,10 @@ If you can't make a pull request, [open an issue](https://github.com/tristan202/
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
 You are free to use, study, modify and distribute this software, including commercially. If you distribute it or a modified version, you must make the source code available under the same license.
+
+### Third-party software
+
+The installer and portable `.exe` include [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2 (`sox_ng.exe`), unchanged from the official Windows build. SoX-NG is licensed under the [GNU General Public License v2](https://codeberg.org/sox_ng/sox_ng/src/branch/main/COPYING); the license text is installed next to it as `resources\sox\COPYING`. Its source code is attached to every PadReady release as `sox_ng-14.7.2.tar.gz` and is also available from the [SoX-NG 14.7.2 release](https://codeberg.org/sox_ng/sox_ng/releases/tag/sox_ng-14.7.2). The Windows build is statically linked with libraries such as libmad, libsndfile, FLAC, libvorbis and Opus; see the SoX-NG [MXE build instructions](https://codeberg.org/sox_ng/sox_ng/wiki/Distro-MXE.md) for how it is built.
 
 ## 👤 Credits
 
