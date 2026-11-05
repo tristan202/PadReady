@@ -1,4 +1,4 @@
-# PadReady v2.1.2
+# PadReady v2.1.3
 
 Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
 
@@ -6,7 +6,7 @@ PadReady was previously called the Sonicware Lofi-12 XT Tool.
 
 Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all hardware settings and the output folder are in the sidebar, and the main window has the file list, a waveform preview and a convert bar with a progress bar. The window can be resized, and the grey and orange colors are the same as before.
 
-<img width="816" alt="Screenshot of PadReady v2.1.2" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.1.3" src="docs/screenshot.png" />
 
 ## 🚀 Features
 

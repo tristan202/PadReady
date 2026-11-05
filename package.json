@@ -1,7 +1,7 @@
 {
   "name": "padready",
   "productName": "PadReady",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Gets your samples ready for hardware samplers: batch conversion with device presets, powered by SoX.",
   "main": "src/main/main.js",
   "author": "tristan202",
