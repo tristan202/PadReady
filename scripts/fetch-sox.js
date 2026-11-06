@@ -1,4 +1,4 @@
-// Downloads the official SoX-NG Windows build and its source into vendor/ so electron-builder
+// Downloads the official SoX-NG Windows build and its source into vendor/ so the Tauri bundle
 // can bundle SoX with PadReady. Runs before every `npm run dist*`. Files are checked by SHA-256.
 //
 // SoX-NG is GPL v2. Its source tarball is kept in vendor/ so it can be attached to each release.

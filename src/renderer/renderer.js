@@ -2,7 +2,7 @@
 
 const $ = (id) => document.getElementById(id);
 
-let DEVICES = []; // loaded from src/main/devices.json
+let DEVICES = []; // loaded from devices.json
 const SAMPLE_RATES = ['12000', '24000', '44100', '48000'];
 const BIT_DEPTHS = [{ label: '16-bit', value: 16 }, { label: '24-bit', value: 24 }];
 const CHANNELS = [{ label: 'Mono', value: 1 }, { label: 'Stereo', value: 2 }];
@@ -437,27 +437,10 @@ function bindEvents() {
     $(id).addEventListener('change', () => save({ [key]: $(id).checked }));
   }
 
-  // Drag and drop of files and folders anywhere on the window
-  let dragDepth = 0;
-  window.addEventListener('dragenter', (e) => {
-    e.preventDefault();
-    dragDepth++;
-    document.body.classList.add('dragging');
-  });
-  window.addEventListener('dragleave', () => {
-    dragDepth = Math.max(0, dragDepth - 1);
-    if (dragDepth === 0) document.body.classList.remove('dragging');
-  });
-  window.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-  });
-  window.addEventListener('drop', async (e) => {
-    e.preventDefault();
-    dragDepth = 0;
-    document.body.classList.remove('dragging');
-    const paths = [...e.dataTransfer.files].map((f) => window.api.pathForFile(f)).filter(Boolean);
-    if (paths.length) addFiles(await window.api.expandPaths(paths));
+  // Drag and drop of files and folders anywhere on the window (the window reports the dropped paths)
+  window.api.onDragDrop(async ({ type, paths }) => {
+    document.body.classList.toggle('dragging', type === 'enter' || type === 'over');
+    if (type === 'drop' && paths.length) addFiles(await window.api.expandPaths(paths));
   });
 }
 

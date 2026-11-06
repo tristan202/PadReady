@@ -208,4 +208,4 @@ function getStrings(language) {
   return { ...COMMON, ...(STRINGS[language] || STRINGS.English) };
 }
 
-module.exports = { LANGUAGES, STRINGS, getStrings };
+if (typeof module !== 'undefined') module.exports = { LANGUAGES, STRINGS, getStrings };

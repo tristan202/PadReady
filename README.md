@@ -6,6 +6,8 @@ PadReady was previously called the Sonicware Lofi-12 XT Tool.
 
 Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all hardware settings and the output folder are in the sidebar, and the main window has the file list, a waveform preview and a convert bar with a progress bar. The window can be resized, and the grey and orange colors are the same as before.
 
+The app now runs on [Tauri](https://tauri.app/) instead of Electron: it uses the WebView2 that is built into Windows 10 and 11, so the download is about a tenth of the size and the app starts faster and uses less memory. Everything looks and works the same, and your settings carry over.
+
 <img width="816" alt="Screenshot of PadReady v2.1.3" src="docs/screenshot.png" />
 
 ## 🚀 Features
@@ -45,12 +47,14 @@ Output is WAV or AIFF.
 ## 🛠 Installation
 
 1. **Download the tool:** Get the latest release from the [Releases](https://github.com/tristan202/PadReady/releases) page:
-   - `PadReady Setup x.y.z.exe` is a normal step-by-step installer: choose whether to install just for you (no admin rights needed) or for all users, and pick the install folder. It adds a Start menu and desktop shortcut, and can be removed again from Windows Settings > Apps.
-   - `PadReady-x.y.z-portable.exe` runs without installing.
+   - `PadReady_x.y.z_x64-setup.exe` is a normal step-by-step installer: choose whether to install just for you (no admin rights needed) or for all users, and pick the install folder. It adds a Start menu and desktop shortcut, and can be removed again from Windows Settings > Apps. If WebView2 is missing (only on old Windows versions), the installer downloads it.
+   - `PadReady-x.y.z-portable.zip` runs without installing: unzip it anywhere and start `PadReady.exe` (keep the `sox` folder next to it).
+
+   If you have PadReady 2.x installed, uninstall it from Windows Settings > Apps first; your settings are kept.
 2. **SoX is included:** PadReady comes with [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2, the audio engine that does the conversion, so there is nothing else to install. It reads WAV, AIFF, MP3, FLAC and OGG.
 
    To use your own SoX instead (for example a build that also reads WMA and M4A through ffmpeg), place `sox.exe` or `sox_ng.exe` and its `.dll` files in the folder you installed PadReady to. The tool looks for SoX in this order:
-   - the same folder as the tool (for the installed version that is the folder you picked, by default `%LOCALAPPDATA%\Programs\PadReady` for just you or `C:\Program Files\PadReady` for all users),
+   - the same folder as the tool (for the installed version that is the folder you picked, by default `%LOCALAPPDATA%\PadReady` for just you or `C:\Program Files\PadReady` for all users),
    - `C:\Program Files (x86)\sox-14-4-2\`,
    - any folder on your `PATH`,
    - the SoX-NG that comes with PadReady.
@@ -68,7 +72,7 @@ Settings are stored in `%APPDATA%\PadReady\settings.json`. Converted files go to
 
 ## 🧑‍💻 Building from Source
 
-You need [Node.js](https://nodejs.org/) 20 or newer.
+You need [Node.js](https://nodejs.org/) 20 or newer and [Rust](https://rustup.rs/) (see the [Tauri prerequisites](https://tauri.app/start/prerequisites/)).
 
 ```bash
 npm install
@@ -80,31 +84,33 @@ Run the app (it finds `sox.exe` / `sox_ng.exe` in the project folder, on your `P
 npm start
 ```
 
-Run the tests (the conversion test is skipped if SoX isn't found):
+Run the tests (JavaScript with Node, then the Rust side with `cargo test`; the conversion tests are skipped if SoX isn't found):
 
 ```bash
 npm test
 ```
 
-Build the Windows installer into `dist/`. This first runs `npm run fetch-sox`, which downloads the official SoX-NG Windows build and its source code from Codeberg into `vendor/` and checks their SHA-256 checksums, so SoX is bundled with the app:
+Build the Windows installer. This first runs `npm run fetch-sox`, which downloads the official SoX-NG Windows build and its source code from Codeberg into `vendor/` and checks their SHA-256 checksums, so SoX is bundled with the app:
 
 ```bash
 npm run dist
 ```
 
-Build the portable `.exe` instead (or `npm run dist:all` for both):
+Build the installer and the portable zip:
 
 ```bash
 npm run dist:portable
 ```
 
-The app uses Electron, so it can in principle run on macOS and Linux with `sox` installed from your package manager, but only Windows has been tested.
+The installer ends up in `src-tauri/target/release/bundle/nsis/`, the portable zip in `dist/`.
+
+The app uses Tauri, so it can in principle run on macOS and Linux with `sox` installed from your package manager, but only Windows has been tested.
 
 The original PureBasic version (v1.x) is still available in the git history and in the v1.0.0 release.
 
 ## 🎛 Adding Your Device
 
-Device presets live in [`src/main/devices.json`](src/main/devices.json). To add a sampler, add one line and open a pull request:
+Device presets live in [`src/renderer/devices.json`](src/renderer/devices.json). To add a sampler, add one line and open a pull request:
 
 ```json
 { "name": "Maker Model", "sampleRate": 44100, "bitDepth": 16, "channels": 1 }
@@ -127,7 +133,7 @@ You are free to use, study, modify and distribute this software, including comme
 
 ### Third-party software
 
-The installer and portable `.exe` include [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2 (`sox_ng.exe`), unchanged from the official Windows build. SoX-NG is licensed under the [GNU General Public License v2](https://codeberg.org/sox_ng/sox_ng/src/branch/main/COPYING); the license text is installed next to it as `resources\sox\COPYING`. Its source code is attached to every PadReady release as `sox_ng-14.7.2.tar.gz` and is also available from the [SoX-NG 14.7.2 release](https://codeberg.org/sox_ng/sox_ng/releases/tag/sox_ng-14.7.2). The Windows build is statically linked with libraries such as libmad, libsndfile, FLAC, libvorbis and Opus; see the SoX-NG [MXE build instructions](https://codeberg.org/sox_ng/sox_ng/wiki/Distro-MXE.md) for how it is built.
+The installer and portable `.exe` include [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2 (`sox_ng.exe`), unchanged from the official Windows build. SoX-NG is licensed under the [GNU General Public License v2](https://codeberg.org/sox_ng/sox_ng/src/branch/main/COPYING); the license text is installed next to it as `sox\COPYING`. Its source code is attached to every PadReady release as `sox_ng-14.7.2.tar.gz` and is also available from the [SoX-NG 14.7.2 release](https://codeberg.org/sox_ng/sox_ng/releases/tag/sox_ng-14.7.2). The Windows build is statically linked with libraries such as libmad, libsndfile, FLAC, libvorbis and Opus; see the SoX-NG [MXE build instructions](https://codeberg.org/sox_ng/sox_ng/wiki/Distro-MXE.md) for how it is built.
 
 ## 👤 Credits
 

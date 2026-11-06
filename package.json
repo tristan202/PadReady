@@ -3,7 +3,6 @@
   "productName": "PadReady",
   "version": "2.1.3",
   "description": "Gets your samples ready for hardware samplers: batch conversion with device presets, powered by SoX.",
-  "main": "src/main/main.js",
   "author": "tristan202",
   "license": "GPL-3.0-only",
   "repository": {
@@ -11,56 +10,14 @@
     "url": "https://github.com/tristan202/PadReady.git"
   },
   "scripts": {
-    "start": "electron .",
-    "test": "node --test",
+    "start": "tauri dev",
+    "test": "node --test && npm run test:rust",
+    "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml",
     "fetch-sox": "node scripts/fetch-sox.js",
-    "dist": "npm run fetch-sox && electron-builder --win nsis",
-    "dist:portable": "npm run fetch-sox && electron-builder --win portable",
-    "dist:all": "npm run fetch-sox && electron-builder --win nsis portable"
+    "dist": "npm run fetch-sox && tauri build",
+    "dist:portable": "npm run dist && node scripts/portable.js"
   },
   "devDependencies": {
-    "electron": "44.5.1",
-    "electron-builder": "26.15.3"
-  },
-  "build": {
-    "appId": "com.tristan202.padready",
-    "productName": "PadReady",
-    "files": [
-      "src/**/*",
-      "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "vendor/sox",
-        "to": "sox"
-      }
-    ],
-    "electronLanguages": [
-      "en-US",
-      "da",
-      "de",
-      "es",
-      "fr",
-      "it",
-      "sv"
-    ],
-    "compression": "maximum",
-    "win": {
-      "target": [
-        "nsis"
-      ],
-      "icon": "build/icon.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "perMachine": false,
-      "deleteAppDataOnUninstall": false,
-      "shortcutName": "PadReady",
-      "artifactName": "${productName} Setup ${version}.${ext}"
-    },
-    "portable": {
-      "artifactName": "${productName}-${version}-portable.${ext}"
-    }
+    "@tauri-apps/cli": "^2.12.4"
   }
 }
