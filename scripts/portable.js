@@ -18,7 +18,7 @@ fs.cpSync(path.join(root, 'vendor', 'sox'), path.join(stage, 'sox'), { recursive
 const zip = path.join(root, 'dist', `PadReady-${version}-portable.zip`);
 fs.rmSync(zip, { force: true });
 // Windows' own tar.exe (bsdtar) writes zip files with -a
-const tar = path.join(process.env.SystemRoot || 'C:\Windows', 'System32', 'tar.exe');
+const tar = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe');
 const result = spawnSync(tar, ['-a', '-c', '-f', zip, '-C', stage, 'PadReady.exe', 'sox'], { stdio: 'inherit' });
 if (result.status !== 0) process.exit(result.status || 1);
 fs.rmSync(stage, { recursive: true, force: true });
