@@ -1,4 +1,4 @@
-# PadReady v2.1.3
+# PadReady v2.2.0
 
 Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
 
@@ -8,7 +8,7 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
 
 The app now runs on [Tauri](https://tauri.app/) instead of Electron: it uses the WebView2 that is built into Windows 10 and 11, so the download is about a tenth of the size and the app starts faster and uses less memory. Everything looks and works the same, and your settings carry over.
 
-<img width="816" alt="Screenshot of PadReady v2.1.3" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.2.0" src="docs/screenshot.png" />
 
 ## 🚀 Features
 
@@ -133,7 +133,7 @@ You are free to use, study, modify and distribute this software, including comme
 
 ### Third-party software
 
-The installer and portable `.exe` include [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2 (`sox_ng.exe`), unchanged from the official Windows build. SoX-NG is licensed under the [GNU General Public License v2](https://codeberg.org/sox_ng/sox_ng/src/branch/main/COPYING); the license text is installed next to it as `sox\COPYING`. Its source code is attached to every PadReady release as `sox_ng-14.7.2.tar.gz` and is also available from the [SoX-NG 14.7.2 release](https://codeberg.org/sox_ng/sox_ng/releases/tag/sox_ng-14.7.2). The Windows build is statically linked with libraries such as libmad, libsndfile, FLAC, libvorbis and Opus; see the SoX-NG [MXE build instructions](https://codeberg.org/sox_ng/sox_ng/wiki/Distro-MXE.md) for how it is built.
+The installer and portable zip include [SoX-NG](https://codeberg.org/sox_ng/sox_ng) 14.7.2 (`sox_ng.exe`), unchanged from the official Windows build. SoX-NG is licensed under the [GNU General Public License v2](https://codeberg.org/sox_ng/sox_ng/src/branch/main/COPYING); the license text is installed next to it as `sox\COPYING`. Its source code is attached to every PadReady release as `sox_ng-14.7.2.tar.gz` and is also available from the [SoX-NG 14.7.2 release](https://codeberg.org/sox_ng/sox_ng/releases/tag/sox_ng-14.7.2). The Windows build is statically linked with libraries such as libmad, libsndfile, FLAC, libvorbis and Opus; see the SoX-NG [MXE build instructions](https://codeberg.org/sox_ng/sox_ng/wiki/Distro-MXE.md) for how it is built.
 
 ## 👤 Credits
 
