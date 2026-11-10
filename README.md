@@ -1,4 +1,4 @@
-# PadReady v2.2.0
+# PadReady v2.3.0
 
 Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
 
@@ -8,7 +8,7 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
 
 The app now runs on [Tauri](https://tauri.app/) instead of Electron: it uses the WebView2 that is built into Windows 10 and 11, so the download is about a tenth of the size and the app starts faster and uses less memory. Everything looks and works the same, and your settings carry over.
 
-<img width="816" alt="Screenshot of PadReady v2.2.0" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.3.0" src="docs/screenshot.png" />
 
 ## 🚀 Features
 
@@ -29,7 +29,7 @@ The app now runs on [Tauri](https://tauri.app/) instead of Electron: it uses the
 
   You can also pick sample rate (12/24/44.1/48 kHz), bit depth (16/24-bit), channels (mono/stereo) and format (WAV/AIFF) by hand.
 
-  Missing your sampler? [Add it](#-adding-your-device) — it's one line.
+  Missing your sampler? Set sample rate, bit depth, channels and format, click **+** next to the hardware list and give it a name. Your own samplers are listed under "My samplers", and **✕** deletes one. To add it for everyone, [add it to the app](#-adding-your-device) — it's one line.
 - **Smart filenames:** Replaces spaces and invalid characters with underscores and never overwrites existing files (a numbered suffix is added instead).
 - **Normalize:** Peak normalization to 0 dB for consistent volume across all your samples.
 - **Auto-Trim:** Removes silence at the start and end of each sample.
