@@ -1,7 +1,7 @@
 {
   "name": "padready",
   "productName": "PadReady",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Gets your samples ready for hardware samplers: batch conversion with device presets, powered by SoX.",
   "author": "tristan202",
   "license": "GPL-3.0-only",

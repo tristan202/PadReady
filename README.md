@@ -1,4 +1,4 @@
-# PadReady v2.3.0
+# PadReady v2.3.1
 
 Get any sound in your library ready for your hardware sampler in one drag. PadReady batch-converts audio to the exact format your sampler wants (Sonicware Lofi-12 XT, Elektron Digitakt, Roland SP-404, Polyend Tracker, Teenage Engineering OP-1 and more) and packs the result as a zip kit you can share. Powered by the SoX (Sound eXchange) engine.
 
@@ -8,7 +8,7 @@ Version 2.0 is a complete rewrite in Electron (Node.js) with a new layout: all h
 
 The app now runs on [Tauri](https://tauri.app/) instead of Electron: it uses the WebView2 that is built into Windows 10 and 11, so the download is about a tenth of the size and the app starts faster and uses less memory. Everything looks and works the same, and your settings carry over.
 
-<img width="816" alt="Screenshot of PadReady v2.3.0" src="docs/screenshot.png" />
+<img width="816" alt="Screenshot of PadReady v2.3.1" src="docs/screenshot.png" />
 
 ## 🚀 Features
 
