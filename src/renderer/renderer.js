@@ -52,6 +52,16 @@ function fillDevices(selected) {
   $('btnDeleteDevice').disabled = select.selectedIndex < BUILTIN_DEVICES.length;
 }
 
+function deviceFromSelects(name) {
+  return {
+    name,
+    sampleRate: Number(SAMPLE_RATES[$('comboSampleRate').selectedIndex]),
+    bitDepth: BIT_DEPTHS[$('comboBitDepth').selectedIndex].value,
+    channels: CHANNELS[$('comboChannels').selectedIndex].value,
+    format: FORMATS[$('comboFormat').selectedIndex].value,
+  };
+}
+
 function splitPath(p) {
   const i = Math.max(p.lastIndexOf('\\'), p.lastIndexOf('/'));
   return { dir: p.slice(0, i + 1), name: p.slice(i + 1) };
@@ -456,13 +466,7 @@ function bindEvents() {
       window.alert(s.MsgDeviceBuiltIn);
       return;
     }
-    const device = {
-      name,
-      sampleRate: Number(SAMPLE_RATES[$('comboSampleRate').selectedIndex]),
-      bitDepth: BIT_DEPTHS[$('comboBitDepth').selectedIndex].value,
-      channels: CHANNELS[$('comboChannels').selectedIndex].value,
-      format: FORMATS[$('comboFormat').selectedIndex].value,
-    };
+    const device = deviceFromSelects(name);
     // Saving under the name of one of your own replaces it
     const i = customDevices.findIndex((d) => d.name === name);
     customDevices = i < 0 ? [...customDevices, device] : customDevices.map((d, j) => (j === i ? device : d));
@@ -485,6 +489,13 @@ function bindEvents() {
   for (const [id, key] of Object.entries(selects)) {
     $(id).addEventListener('change', () => {
       save({ [key]: $(id).selectedIndex });
+      // Changes while one of your own samplers is selected are saved into that sampler
+      const i = $('comboDevice').selectedIndex - BUILTIN_DEVICES.length;
+      if (i >= 0) {
+        customDevices = customDevices.map((d, j) => (j === i ? deviceFromSelects(d.name) : d));
+        DEVICES = [...BUILTIN_DEVICES, ...customDevices];
+        save({ customDevices });
+      }
       showIdle();
     });
   }
