@@ -2,7 +2,9 @@
 
 const $ = (id) => document.getElementById(id);
 
-let DEVICES = []; // loaded from devices.json
+let BUILTIN_DEVICES = []; // loaded from devices.json
+let customDevices = [];   // the user's own samplers, stored in settings
+let DEVICES = [];         // both, in the order of the device list
 const SAMPLE_RATES = ['12000', '24000', '44100', '48000'];
 const BIT_DEPTHS = [{ label: '16-bit', value: 16 }, { label: '24-bit', value: 24 }];
 const CHANNELS = [{ label: 'Mono', value: 1 }, { label: 'Stereo', value: 2 }];
@@ -33,6 +35,21 @@ let audioContext = null;
 
 function fillSelect(select, items) {
   select.replaceChildren(...items.map((label, i) => new Option(label, String(i))));
+}
+
+// Built-in samplers first, then the user's own under their own heading
+function fillDevices(selected) {
+  DEVICES = [...BUILTIN_DEVICES, ...customDevices];
+  const select = $('comboDevice');
+  fillSelect(select, BUILTIN_DEVICES.map((d) => d.name));
+  if (customDevices.length) {
+    const group = document.createElement('optgroup');
+    group.label = state.strings.GroupCustom || '';
+    group.append(...customDevices.map((d, i) => new Option(d.name, String(BUILTIN_DEVICES.length + i))));
+    select.append(group);
+  }
+  select.selectedIndex = clampIndex(selected, DEVICES.length);
+  $('btnDeleteDevice').disabled = select.selectedIndex < BUILTIN_DEVICES.length;
 }
 
 function splitPath(p) {
@@ -109,6 +126,10 @@ function applyStrings(strings) {
   $('btnPreview').title = s.TipPlay;
   $('btnStop').title = s.TipStop;
   $('btnAbout').title = s.MenuAbout;
+  $('btnAddDevice').title = s.TipAddDevice;
+  $('btnDeleteDevice').title = s.TipDeleteDevice;
+  const group = $('comboDevice').querySelector('optgroup');
+  if (group) group.label = s.GroupCustom;
   $('langPick').title = s.MenuLang;
   updateSoxStatus();
   updateCount();
@@ -422,8 +443,43 @@ function bindEvents() {
     $('comboBitDepth').selectedIndex = idx.bitDepthIdx;
     $('comboChannels').selectedIndex = idx.channelsIdx;
     $('comboFormat').selectedIndex = idx.formatIdx;
+    $('btnDeleteDevice').disabled = $('comboDevice').selectedIndex < BUILTIN_DEVICES.length;
     save({ deviceIdx: $('comboDevice').selectedIndex, ...idx });
     showIdle();
+  });
+  $('btnAddDevice').addEventListener('click', () => {
+    const s = state.strings;
+    const current = DEVICES[$('comboDevice').selectedIndex];
+    const name = window.prompt(s.AskDeviceName, customDevices.includes(current) ? current.name : '')?.trim();
+    if (!name) return;
+    if (BUILTIN_DEVICES.some((d) => d.name === name)) {
+      window.alert(s.MsgDeviceBuiltIn);
+      return;
+    }
+    const device = {
+      name,
+      sampleRate: Number(SAMPLE_RATES[$('comboSampleRate').selectedIndex]),
+      bitDepth: BIT_DEPTHS[$('comboBitDepth').selectedIndex].value,
+      channels: CHANNELS[$('comboChannels').selectedIndex].value,
+      format: FORMATS[$('comboFormat').selectedIndex].value,
+    };
+    // Saving under the name of one of your own replaces it
+    const i = customDevices.findIndex((d) => d.name === name);
+    customDevices = i < 0 ? [...customDevices, device] : customDevices.map((d, j) => (j === i ? device : d));
+    const deviceIdx = BUILTIN_DEVICES.length + (i < 0 ? customDevices.length - 1 : i);
+    fillDevices(deviceIdx);
+    save({ customDevices, deviceIdx });
+    showIdle();
+  });
+  $('btnDeleteDevice').addEventListener('click', async () => {
+    const i = $('comboDevice').selectedIndex - BUILTIN_DEVICES.length;
+    // The Tauri dialog plugin makes window.confirm async
+    if (i < 0 || !await window.confirm(state.strings.AskDeleteDevice.replace('%NAME%', customDevices[i].name))) return;
+    customDevices = customDevices.filter((_, j) => j !== i);
+    save({ customDevices });
+    // Select the sampler above the deleted one and use its settings
+    fillDevices(BUILTIN_DEVICES.length + i - 1);
+    $('comboDevice').dispatchEvent(new Event('change'));
   });
   const selects = { comboSampleRate: 'sampleRateIdx', comboBitDepth: 'bitDepthIdx', comboChannels: 'channelsIdx', comboFormat: 'formatIdx' };
   for (const [id, key] of Object.entries(selects)) {
@@ -452,18 +508,18 @@ function clampIndex(i, length) {
 
 async function init() {
   const { settings, strings, sox, languages, devices } = await window.api.getInitialState();
-  DEVICES = devices;
+  BUILTIN_DEVICES = devices;
+  customDevices = settings.customDevices;
   state.sox = sox;
   state.outputDir = settings.outputDir;
 
-  fillSelect($('comboDevice'), DEVICES.map((d) => d.name));
+  fillDevices(settings.deviceIdx);
   fillSelect($('comboSampleRate'), SAMPLE_RATES);
   fillSelect($('comboBitDepth'), BIT_DEPTHS.map((b) => b.label));
   fillSelect($('comboChannels'), CHANNELS.map((c) => c.label));
   fillSelect($('comboFormat'), FORMATS.map((f) => f.label));
   $('langSelect').replaceChildren(...languages.map((l) => new Option(l.label, l.key)));
   $('langSelect').value = settings.language;
-  $('comboDevice').selectedIndex = clampIndex(settings.deviceIdx, DEVICES.length);
   $('comboSampleRate').selectedIndex = clampIndex(settings.sampleRateIdx, SAMPLE_RATES.length);
   $('comboBitDepth').selectedIndex = clampIndex(settings.bitDepthIdx, BIT_DEPTHS.length);
   $('comboChannels').selectedIndex = clampIndex(settings.channelsIdx, CHANNELS.length);

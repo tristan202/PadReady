@@ -16,7 +16,11 @@
 
       <div class="side-scroll">
         <div class="group-head" id="txtFrameSettings"></div>
-        <label class="field"><span id="lblDevice"></span><select id="comboDevice"></select></label>
+        <div class="row device-row">
+          <label class="field grow"><span id="lblDevice"></span><select id="comboDevice"></select></label>
+          <button id="btnAddDevice" class="icon-btn">+</button>
+          <button id="btnDeleteDevice" class="icon-btn">&#x2715;</button>
+        </div>
         <div class="row">
           <label class="field grow"><span id="lblSampleRate"></span><select id="comboSampleRate"></select></label>
           <label class="field grow"><span id="lblBitDepth"></span><select id="comboBitDepth"></select></label>

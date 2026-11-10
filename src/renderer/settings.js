@@ -14,12 +14,28 @@ const SETTINGS_DEFAULTS = {
   reverse: false,
   openDir: true,
   soxPath: '',
+  customDevices: [], // the user's own samplers, same shape as the entries in devices.json
 };
+
+// Same values as SAMPLE_RATES / BIT_DEPTHS / CHANNELS / FORMATS in renderer.js
+function isValidDevice(d) {
+  return !!d && typeof d.name === 'string' && d.name.trim() !== ''
+    && [12000, 24000, 44100, 48000].includes(d.sampleRate)
+    && [16, 24].includes(d.bitDepth)
+    && [1, 2].includes(d.channels)
+    && [undefined, 'wav', 'aiff'].includes(d.format);
+}
 
 // Copies known keys whose type matches the default; anything else is ignored
 function mergeSettings(values, patch) {
   for (const key of Object.keys(patch || {})) {
-    if (key in SETTINGS_DEFAULTS && typeof patch[key] === typeof SETTINGS_DEFAULTS[key]) values[key] = patch[key];
+    if (!(key in SETTINGS_DEFAULTS)) continue;
+    const def = SETTINGS_DEFAULTS[key];
+    if (Array.isArray(def)) {
+      if (Array.isArray(patch[key])) values[key] = patch[key].filter(isValidDevice);
+    } else if (typeof patch[key] === typeof def) {
+      values[key] = patch[key];
+    }
   }
   return values;
 }
@@ -35,4 +51,4 @@ function parseSettings(json, defaults = {}) {
   return mergeSettings({ ...SETTINGS_DEFAULTS, ...defaults }, stored);
 }
 
-if (typeof module !== 'undefined') module.exports = { SETTINGS_DEFAULTS, mergeSettings, parseSettings };
+if (typeof module !== 'undefined') module.exports = { SETTINGS_DEFAULTS, isValidDevice, mergeSettings, parseSettings };

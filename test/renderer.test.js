@@ -1,7 +1,7 @@
 // Tests for the pure renderer modules. SoX, file listing and zip export are tested in Rust: `npm run test:rust`.
 const test = require('node:test');
 const assert = require('node:assert');
-const { parseSettings, mergeSettings } = require('../src/renderer/settings');
+const { parseSettings, mergeSettings, isValidDevice } =require('../src/renderer/settings');
 const { STRINGS } = require('../src/renderer/i18n');
 
 test('settings keep valid values and ignore bad ones', () => {
@@ -35,10 +35,15 @@ test('devices.json entries use values the app offers', () => {
     assert.ok(typeof d.name === 'string' && d.name.trim(), `missing name: ${JSON.stringify(d)}`);
     assert.ok(!names.has(d.name), `duplicate name: ${d.name}`);
     names.add(d.name);
-    // Must match SAMPLE_RATES / BIT_DEPTHS / CHANNELS in src/renderer/renderer.js
-    assert.ok([12000, 24000, 44100, 48000].includes(d.sampleRate), `${d.name}: sampleRate ${d.sampleRate}`);
-    assert.ok([16, 24].includes(d.bitDepth), `${d.name}: bitDepth ${d.bitDepth}`);
-    assert.ok([1, 2].includes(d.channels), `${d.name}: channels ${d.channels}`);
-    assert.ok([undefined, 'wav', 'aiff'].includes(d.format), `${d.name}: format ${d.format}`);
+    assert.ok(isValidDevice(d), `${d.name}: ${JSON.stringify(d)}`);
   }
+});
+
+test('custom samplers keep only valid entries', () => {
+  const kept = { name: 'Volca Sample', sampleRate: 24000, bitDepth: 16, channels: 1, format: 'wav' };
+  const settings = parseSettings(JSON.stringify({ customDevices: [kept, { name: 'Bad', sampleRate: 31250, bitDepth: 16, channels: 1 }, null] }));
+  assert.deepStrictEqual(settings.customDevices, [kept]);
+  mergeSettings(settings, { customDevices: 'nope' });
+  assert.deepStrictEqual(settings.customDevices, [kept]);
+  assert.deepStrictEqual(parseSettings('').customDevices, []);
 });

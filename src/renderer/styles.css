@@ -43,6 +43,9 @@ button, input, select { font: inherit; color: inherit; }
 .field select option { background: var(--panel); }
 .row { display: flex; gap: 8px; }
 .grow { flex: 1; min-width: 0; }
+.device-row { align-items: flex-end; gap: 2px; }
+.device-row .icon-btn { font-size: 16px; line-height: 1; padding: 8px 7px; }
+.icon-btn:disabled { opacity: 0.35; cursor: default; background: none; }
 .checks { display: flex; flex-direction: column; gap: 6px; padding-top: 2px; }
 .check { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
 .check input { margin: 0; accent-color: var(--accent); width: 15px; height: 15px; }
